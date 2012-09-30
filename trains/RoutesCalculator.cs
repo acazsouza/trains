@@ -13,10 +13,13 @@ namespace trains
 
         public void InsertRoute(Route route)
         {
-            if (0 == Routes.Where(x => x.InitialPoint == route.InitialPoint && x.FinalPoint == route.FinalPoint).Count())
-                Routes.Add(route);
-            else
+            if (Routes.Where(x => x.StartPoint == route.StartPoint && x.FinalPoint == route.FinalPoint).Count() > 0)
                 throw new Exception("The route between this points is already exist.");
+
+            if (route.StartPoint == route.FinalPoint)
+                throw new Exception("For a given route, the starting and final point could not be the same.");
+
+            Routes.Add(route);
         }
     }
 }

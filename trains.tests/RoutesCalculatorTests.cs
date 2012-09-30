@@ -37,5 +37,22 @@ namespace trains.tests
                 throw;
             }
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void InsertRoute_with_a_route_where_the_start_and_final_point_are_the_same_should_throw_a_exception()
+        {
+            RoutesCalculator routesCalculator = new RoutesCalculator();
+
+            try
+            {
+                routesCalculator.InsertRoute(new Route('B', 'B', 5));
+            }
+            catch (Exception ex)
+            {
+                Assert.AreEqual("For a given route, the starting and final point could not be the same.", ex.Message);
+                throw;
+            }
+        }
     }
 }

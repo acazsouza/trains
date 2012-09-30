@@ -7,15 +7,15 @@ namespace trains
 {
     public struct Route
     {
-        public char InitialPoint { get; private set; }
+        public char StartPoint { get; private set; }
 
         public char FinalPoint { get; private set; }
 
         public int Distance { get; private set; }
 
-        public Route(char initialPoint, char finalPoint, int distance) : this()
+        public Route(char startPoint, char finalPoint, int distance) : this()
         {
-            this.InitialPoint = initialPoint;
+            this.StartPoint = startPoint;
             this.FinalPoint = finalPoint;
             this.Distance = distance;
         }
