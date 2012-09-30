@@ -22,9 +22,27 @@ namespace trains
             Routes.Add(route);
         }
 
-        public int CalculateDistance(params char[] point)
+        public int CalculateDistance(params char[] points)
         {
-            return 0;
+            int distance = 0;
+
+            for (int i = 0; i < (points.Count() - 1); i++)
+            {
+                Route route;
+
+                try
+                {
+                    route = Routes.Where(x => x.StartPoint == points[i] && x.FinalPoint == points[i + 1]).First();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("NO SUCH ROUTE");
+                }
+
+                distance += route.Distance;
+            }
+
+            return distance;
         }
     }
 }
