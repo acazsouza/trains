@@ -1,0 +1,8 @@
+_ReSharper.*
+*.[Rr]eSharper.user
+*/[Bb]in
+*/[Oo]bj
+*.user
+*.suo
+[Tt]humbs.db
+TestResults
