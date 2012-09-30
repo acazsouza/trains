@@ -54,5 +54,53 @@ namespace trains.tests
                 throw;
             }
         }
+
+        [TestMethod]
+        public void CalculateDistance_with_a_valid_route_should_return_the_distance()
+        {
+            RoutesCalculator routesCalculator = new RoutesCalculator();
+
+            routesCalculator.InsertRoute(new Route('A', 'B', 5));
+            routesCalculator.InsertRoute(new Route('B', 'C', 4));
+            routesCalculator.InsertRoute(new Route('C', 'D', 8));
+            routesCalculator.InsertRoute(new Route('D', 'C', 8));
+            routesCalculator.InsertRoute(new Route('D', 'E', 6));
+            routesCalculator.InsertRoute(new Route('A', 'D', 5));
+            routesCalculator.InsertRoute(new Route('C', 'E', 2));
+            routesCalculator.InsertRoute(new Route('E', 'B', 3));
+            routesCalculator.InsertRoute(new Route('A', 'E', 7));
+
+            Assert.IsTrue(9 == routesCalculator.CalculateDistance('A', 'B', 'C'));
+            Assert.IsTrue(5 == routesCalculator.CalculateDistance('A', 'D'));
+            Assert.IsTrue(13 == routesCalculator.CalculateDistance('A', 'D', 'C'));
+            Assert.IsTrue(22 == routesCalculator.CalculateDistance('A', 'E', 'B', 'C', 'D'));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void CalculateDistance_with_a_invalid_route_should_throw_a_exception()
+        {
+            RoutesCalculator routesCalculator = new RoutesCalculator();
+
+            routesCalculator.InsertRoute(new Route('A', 'B', 5));
+            routesCalculator.InsertRoute(new Route('B', 'C', 4));
+            routesCalculator.InsertRoute(new Route('C', 'D', 8));
+            routesCalculator.InsertRoute(new Route('D', 'C', 8));
+            routesCalculator.InsertRoute(new Route('D', 'E', 6));
+            routesCalculator.InsertRoute(new Route('A', 'D', 5));
+            routesCalculator.InsertRoute(new Route('C', 'E', 2));
+            routesCalculator.InsertRoute(new Route('E', 'B', 3));
+            routesCalculator.InsertRoute(new Route('A', 'E', 7));
+
+            try
+            {
+                Assert.IsTrue(9 == routesCalculator.CalculateDistance('A', 'E', 'D'));
+            }
+            catch (Exception ex)
+            {
+                Assert.AreEqual("NO SUCH ROUTE", ex.Message);
+                throw;
+            }
+        }
     }
 }

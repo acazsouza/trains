@@ -21,5 +21,10 @@ namespace trains
 
             Routes.Add(route);
         }
+
+        public int CalculateDistance(params char[] point)
+        {
+            return 0;
+        }
     }
 }
