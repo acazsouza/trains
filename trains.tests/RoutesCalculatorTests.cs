@@ -14,43 +14,55 @@ namespace trains.tests
         {
             RoutesCalculator routesCalculator = new RoutesCalculator();
 
-            routesCalculator.InsertRoute(new Route('A', 'B', 5));
+            City A = new City('A');
+            City B = new City('B');
+
+            routesCalculator.InsertRoute(new Route(A, B, 5));
 
             Assert.IsTrue(1 == routesCalculator.Routes.Count);
         }
 
         [TestMethod]
         [ExpectedException(typeof(Exception))]
-        public void InsertRoute_with_a_duplicate_route_should_throw_a_exception()
+        public void InsertRoute_with_a_duplicate_cities_route_should_throw_a_exception()
         {
             RoutesCalculator routesCalculator = new RoutesCalculator();
 
-            routesCalculator.InsertRoute(new Route('A', 'B', 5));
+            City A = new City('A');
+            City B = new City('B');
+
+            routesCalculator.InsertRoute(new Route(A, B, 5));
 
             try
             {
-                routesCalculator.InsertRoute(new Route('A', 'B', 10));
+                A = new City('A');
+                B = new City('B');
+
+                routesCalculator.InsertRoute(new Route(A, B, 10));
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("The route between this points is already exist.", ex.Message);
+                Assert.AreEqual("The route between this cities is already exist.", ex.Message);
                 throw;
             }
         }
 
         [TestMethod]
         [ExpectedException(typeof(Exception))]
-        public void InsertRoute_with_a_route_where_the_start_and_final_point_are_the_same_should_throw_a_exception()
+        public void InsertRoute_with_a_route_where_the_start_city_and_end_city_are_the_same_should_throw_a_exception()
         {
             RoutesCalculator routesCalculator = new RoutesCalculator();
 
+            City B1 = new City('B');
+            City B2 = new City('B');
+
             try
             {
-                routesCalculator.InsertRoute(new Route('B', 'B', 5));
+                routesCalculator.InsertRoute(new Route(B1, B2, 5));
             }
             catch (Exception ex)
             {
-                Assert.AreEqual("For a given route, the starting and final point could not be the same.", ex.Message);
+                Assert.AreEqual("For a given route, the starting and end city could not be the same.", ex.Message);
                 throw;
             }
         }
@@ -60,47 +72,75 @@ namespace trains.tests
         {
             RoutesCalculator routesCalculator = new RoutesCalculator();
 
-            routesCalculator.InsertRoute(new Route('A', 'B', 5));
-            routesCalculator.InsertRoute(new Route('B', 'C', 4));
-            routesCalculator.InsertRoute(new Route('C', 'D', 8));
-            routesCalculator.InsertRoute(new Route('D', 'C', 8));
-            routesCalculator.InsertRoute(new Route('D', 'E', 6));
-            routesCalculator.InsertRoute(new Route('A', 'D', 5));
-            routesCalculator.InsertRoute(new Route('C', 'E', 2));
-            routesCalculator.InsertRoute(new Route('E', 'B', 3));
-            routesCalculator.InsertRoute(new Route('A', 'E', 7));
+            City A = new City('A');
+            City B = new City('B');
+            City C = new City('C');
+            City D = new City('D');
+            City E = new City('E');
 
-            Assert.IsTrue(9 == routesCalculator.CalculateDistance('A', 'B', 'C'));
-            Assert.IsTrue(5 == routesCalculator.CalculateDistance('A', 'D'));
-            Assert.IsTrue(13 == routesCalculator.CalculateDistance('A', 'D', 'C'));
-            Assert.IsTrue(22 == routesCalculator.CalculateDistance('A', 'E', 'B', 'C', 'D'));
+            routesCalculator.InsertRoute(new Route(A, B, 5));
+            routesCalculator.InsertRoute(new Route(B, C, 4));
+            routesCalculator.InsertRoute(new Route(C, D, 8));
+            routesCalculator.InsertRoute(new Route(D, C, 8));
+            routesCalculator.InsertRoute(new Route(D, E, 6));
+            routesCalculator.InsertRoute(new Route(A, D, 5));
+            routesCalculator.InsertRoute(new Route(C, E, 2));
+            routesCalculator.InsertRoute(new Route(E, B, 3));
+            routesCalculator.InsertRoute(new Route(A, E, 7));
+
+            Assert.IsTrue(9 == routesCalculator.CalculateDistance(A, B, C));
+            Assert.IsTrue(5 == routesCalculator.CalculateDistance(A, D));
+            Assert.IsTrue(13 == routesCalculator.CalculateDistance(A, D, C));
+            Assert.IsTrue(22 == routesCalculator.CalculateDistance(A, E, B, C, D));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
-        public void CalculateDistance_with_a_invalid_route_should_throw_a_exception()
+        public void CalculateDistance_with_a_invalid_route_should_return_negative()
         {
             RoutesCalculator routesCalculator = new RoutesCalculator();
 
-            routesCalculator.InsertRoute(new Route('A', 'B', 5));
-            routesCalculator.InsertRoute(new Route('B', 'C', 4));
-            routesCalculator.InsertRoute(new Route('C', 'D', 8));
-            routesCalculator.InsertRoute(new Route('D', 'C', 8));
-            routesCalculator.InsertRoute(new Route('D', 'E', 6));
-            routesCalculator.InsertRoute(new Route('A', 'D', 5));
-            routesCalculator.InsertRoute(new Route('C', 'E', 2));
-            routesCalculator.InsertRoute(new Route('E', 'B', 3));
-            routesCalculator.InsertRoute(new Route('A', 'E', 7));
+            City A = new City('A');
+            City B = new City('B');
+            City C = new City('C');
+            City D = new City('D');
+            City E = new City('E');
 
-            try
-            {
-                Assert.IsTrue(9 == routesCalculator.CalculateDistance('A', 'E', 'D'));
-            }
-            catch (Exception ex)
-            {
-                Assert.AreEqual("NO SUCH ROUTE", ex.Message);
-                throw;
-            }
+            routesCalculator.InsertRoute(new Route(A, B, 5));
+            routesCalculator.InsertRoute(new Route(B, C, 4));
+            routesCalculator.InsertRoute(new Route(C, D, 8));
+            routesCalculator.InsertRoute(new Route(D, C, 8));
+            routesCalculator.InsertRoute(new Route(D, E, 6));
+            routesCalculator.InsertRoute(new Route(A, D, 5));
+            routesCalculator.InsertRoute(new Route(C, E, 2));
+            routesCalculator.InsertRoute(new Route(E, B, 3));
+            routesCalculator.InsertRoute(new Route(A, E, 7));
+
+            Assert.IsTrue(-1 == routesCalculator.CalculateDistance(A, E, D));
+        }
+
+        [TestMethod]
+        public void NumberOfPossibleTrips_should_return_the_number_of_possible_trips_between_two_cities()
+        {
+            RoutesCalculator routesCalculator = new RoutesCalculator();
+
+            City A = new City('A');
+            City B = new City('B');
+            City C = new City('C');
+            City D = new City('D');
+            City E = new City('E');
+
+            routesCalculator.InsertRoute(new Route(A, B, 5));
+            routesCalculator.InsertRoute(new Route(B, C, 4));
+            routesCalculator.InsertRoute(new Route(C, D, 8));
+            routesCalculator.InsertRoute(new Route(D, C, 8));
+            routesCalculator.InsertRoute(new Route(D, E, 6));
+            routesCalculator.InsertRoute(new Route(A, D, 5));
+            routesCalculator.InsertRoute(new Route(C, E, 2));
+            routesCalculator.InsertRoute(new Route(E, B, 3));
+            routesCalculator.InsertRoute(new Route(A, E, 7));
+
+            Assert.IsTrue(2 == routesCalculator.NumberOfPossibleTrips(C, C, 3));
+            Assert.IsTrue(3 == routesCalculator.NumberOfPossibleTrips(A, C, 4));
         }
     }
 }

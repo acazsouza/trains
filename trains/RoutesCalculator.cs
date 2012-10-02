@@ -13,30 +13,30 @@ namespace trains
 
         public void InsertRoute(Route route)
         {
-            if (Routes.Where(x => x.StartPoint == route.StartPoint && x.FinalPoint == route.FinalPoint).Count() > 0)
-                throw new Exception("The route between this points is already exist.");
+            if (Routes.Where(x => x.StartCity.Id == route.StartCity.Id && x.EndCity.Id == route.EndCity.Id).Count() > 0)
+                throw new Exception("The route between this cities is already exist.");
 
-            if (route.StartPoint == route.FinalPoint)
-                throw new Exception("For a given route, the starting and final point could not be the same.");
+            if (route.StartCity.Id == route.EndCity.Id)
+                throw new Exception("For a given route, the starting and end city could not be the same.");
 
             Routes.Add(route);
         }
 
-        public int CalculateDistance(params char[] points)
+        public int? CalculateDistance(params City[] cities)
         {
             int distance = 0;
 
-            for (int i = 0; i < (points.Count() - 1); i++)
+            for (int i = 0; i < (cities.Count() - 1); i++)
             {
                 Route route;
 
                 try
                 {
-                    route = Routes.Where(x => x.StartPoint == points[i] && x.FinalPoint == points[i + 1]).First();
+                    route = Routes.Where(x => x.StartCity.Id == cities[i].Id && x.EndCity.Id == cities[i + 1].Id).First();
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("NO SUCH ROUTE");
+                    return -1;
                 }
 
                 distance += route.Distance;
@@ -44,5 +44,32 @@ namespace trains
 
             return distance;
         }
+
+        public int? NumberOfPossibleTrips(City startCity, City endCity, int numberOfStops)
+        {
+            int possibleTrips = 0;
+
+            for (int i = 0; i < (cities.Count() - 1); i++)
+            {
+                Route route;
+
+                try
+                {
+                    route = Routes.Where(x => x.StartCity.Id == cities[i].Id && x.EndCity.Id == cities[i + 1].Id).First();
+                }
+                catch (Exception ex)
+                {
+                    return -1;
+                }
+
+                distance += route.Distance;
+            }
+
+            return possibleTrips;
+        }
+
+        /*public int NumberOfTrips(char )
+        {
+        }*/
     }
 }
