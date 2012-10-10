@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -8,6 +9,8 @@ namespace trains
     public class RoutesCalculator
     {
         private IList<Route> routes;
+
+        private IList<GraphNode> GraphNodes { get; set; }
 
         public IList<Route> Routes { get { return routes ?? (routes = new List<Route>()); } }
 
@@ -45,93 +48,46 @@ namespace trains
             return distance;
         }
 
-        /*private IEnumerable<Route> GetPossibleRoutesEndIn(City city)
+        public int PossibleTrips(GraphNode startCity, GraphNode endCity, int numberOfStops)
         {
-            return Routes.Where(x =>  x.EndCity.Id == city.Id);
-        }
+            int possibleTrips = 0;
 
-        private IEnumerable<Route> GetPossibleRoutesStartIn(City city)
-        {
-            return Routes.Where(x => x.StartCity.Id == city.Id);
-        }*/
+            Queue<GraphNode> searchStack = new Queue<GraphNode>();
+            GraphNode current;
+            searchStack.Enqueue(startCity);
 
-        public int? NumberOfPossibleTrips(City startCity, City endCity, int numberOfStops)
-        {
-            IList<IEnumerable<Route>> possibleTrips = new List<IEnumerable<Route>>();
-            IList<Route> trip = new List<Route>();
+            int[] lastLevels = new int[99];
+            int level = 0;
+            int index = 0;
+            lastLevels[level] = 1;
 
-            foreach (Route route in Routes.Where(x => x.EndCity.Id == endCity.Id))
+            while (searchStack.Count != 0)
             {
-                trip.Add(route);
+                lastLevels[level]--;
 
-                if (route.StartCity.Id == startCity.Id)
-                {
-                    trip = new List<Route>();
-                    possibleTrips.Add(trip);
+                if (level <= numberOfStops) {
+                    current = searchStack.Dequeue();
+                    if (current.Id == endCity.Id && index > 0/* && level == numberOfStops*/)
+                    {
+                        possibleTrips++;
+                    }
+
+                    foreach (GraphNode node in current.Nodes)
+                    {
+                        searchStack.Enqueue(node);
+                    }
+
+                    lastLevels[level + 1] += current.Nodes.Count;
+                    if (lastLevels[level] == 0) level++;
                 } else
                 {
-                    foreach (Route route2 in Routes.Where(x => x.EndCity.Id == route.StartCity.Id))
-                    {
-                        trip.Add(route2);
-
-                        if (route2.StartCity.Id == startCity.Id)
-                        {
-                            trip = new List<Route>();
-                            possibleTrips.Add(trip);
-                        }
-                        else
-                        {
-                            foreach (Route route3 in Routes.Where(x => x.EndCity.Id == route2.StartCity.Id))
-                            {
-                                trip.Add(route3);
-
-                                if (route3.StartCity.Id == startCity.Id)
-                                {
-                                    trip = new List<Route>();
-                                    possibleTrips.Add(trip);
-                                }
-                                else
-                                {
-                                    foreach (Route route4 in Routes.Where(x => x.EndCity.Id == route3.StartCity.Id))
-                                    {
-                                        trip.Add(route4);
-
-                                        if (route4.StartCity.Id == startCity.Id)
-                                        {
-                                            trip = new List<Route>();
-                                            possibleTrips.Add(trip);
-                                        }
-                                        else
-                                        {
-                                            foreach (Route route5 in Routes.Where(x => x.EndCity.Id == route4.StartCity.Id))
-                                            {
-                                                trip.Add(route5);
-
-                                                if (route5.StartCity.Id == startCity.Id)
-                                                {
-                                                    trip = new List<Route>();
-                                                    possibleTrips.Add(trip);
-                                                }
-                                                else
-                                                {
-
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    break;
                 }
+
+                index++;
             }
 
-            return possibleTrips.Count();
-        }
-
-        public string Teste(string teste)
-        {
-            return Teste(teste);
+            return possibleTrips;
         }
     }
 }
