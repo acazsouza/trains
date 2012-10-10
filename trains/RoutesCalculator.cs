@@ -67,7 +67,7 @@ namespace trains
 
                 if (level <= numberOfStops) {
                     current = searchStack.Dequeue();
-                    if (current.Id == endCity.Id && index > 0/* && level == numberOfStops*/)
+                    if (current.Id == endCity.Id && index > 0)
                     {
                         possibleTrips++;
                     }
@@ -80,6 +80,50 @@ namespace trains
                     lastLevels[level + 1] += current.Nodes.Count;
                     if (lastLevels[level] == 0) level++;
                 } else
+                {
+                    break;
+                }
+
+                index++;
+            }
+
+            return possibleTrips;
+        }
+
+        public int PossibleTripsWithFixedStops(GraphNode startCity, GraphNode endCity, int numberOfStops)
+        {
+            int possibleTrips = 0;
+
+            Queue<GraphNode> searchStack = new Queue<GraphNode>();
+            GraphNode current;
+            searchStack.Enqueue(startCity);
+
+            int[] lastLevels = new int[99];
+            int level = 0;
+            int index = 0;
+            lastLevels[level] = 1;
+
+            while (searchStack.Count != 0)
+            {
+                lastLevels[level]--;
+
+                if (level <= numberOfStops)
+                {
+                    current = searchStack.Dequeue();
+                    if (current.Id == endCity.Id && index > 0 && level == numberOfStops)
+                    {
+                        possibleTrips++;
+                    }
+
+                    foreach (GraphNode node in current.Nodes)
+                    {
+                        searchStack.Enqueue(node);
+                    }
+
+                    lastLevels[level + 1] += current.Nodes.Count;
+                    if (lastLevels[level] == 0) level++;
+                }
+                else
                 {
                     break;
                 }

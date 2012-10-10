@@ -10,6 +10,10 @@ namespace trains.tests
     [TestClass]
     public class RoutesCalculatorTests
     {
+        /* Fazer os GraphNode serem as próprias Cidades.
+         * Representar uma Matrix com números dentro dos GraphNode p/ calcular distâncias e outras coisas.
+         */
+
         [TestMethod]
         public void InsertRoute_should_save_the_route()
         {
@@ -144,14 +148,40 @@ namespace trains.tests
 
             E.Nodes.Add(B);
 
-            /*Assert.IsTrue(2 == routesCalculator.PossibleTrips(C, C, 3));
+            Assert.IsTrue(2 == routesCalculator.PossibleTrips(C, C, 3));
             Assert.IsTrue(3 == routesCalculator.PossibleTrips(A, C, 3));
             Assert.IsTrue(6 == routesCalculator.PossibleTrips(A, C, 4));
             Assert.IsTrue(3 == routesCalculator.PossibleTrips(D, C, 3));
             Assert.IsTrue(1 == routesCalculator.PossibleTrips(E, B, 1));
-            Assert.IsTrue(2 == routesCalculator.PossibleTrips(E, C, 4));*/
+            Assert.IsTrue(2 == routesCalculator.PossibleTrips(E, C, 4));
+        }
 
-            Assert.IsTrue(3 == routesCalculator.PossibleTrips(A, C, 4));
+        [TestMethod]
+        public void PossibleTripsWithFixedStops_should_return_in_a_determined_number_of_stops_the_number_of_possible_trips_between_two_cities()
+        {
+            RoutesCalculator routesCalculator = new RoutesCalculator();
+
+            GraphNode A = new GraphNode('A');
+            GraphNode B = new GraphNode('B');
+            GraphNode C = new GraphNode('C');
+            GraphNode D = new GraphNode('D');
+            GraphNode E = new GraphNode('E');
+
+            A.Nodes.Add(B);
+            A.Nodes.Add(D);
+            A.Nodes.Add(E);
+
+            B.Nodes.Add(C);
+
+            C.Nodes.Add(D);
+            C.Nodes.Add(E);
+
+            D.Nodes.Add(C);
+            D.Nodes.Add(E);
+
+            E.Nodes.Add(B);
+
+            Assert.IsTrue(3 == routesCalculator.PossibleTripsWithFixedStops(A, C, 4));
         }
     }
 }
