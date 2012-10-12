@@ -8,80 +8,75 @@ namespace trains
 {
     public class RoutesCalculator
     {
-        private IList<Route> routes;
-
-        private IList<GraphNode> GraphNodes { get; set; }
-
-        public IList<Route> Routes { get { return routes ?? (routes = new List<Route>()); } }
-
-        public void InsertRoute(Route route)
-        {
-            if (Routes.Where(x => x.StartCity.Id == route.StartCity.Id && x.EndCity.Id == route.EndCity.Id).Count() > 0)
-                throw new Exception("The route between this cities is already exist.");
-
-            if (route.StartCity.Id == route.EndCity.Id)
-                throw new Exception("For a given route, the starting and end city could not be the same.");
-
-            Routes.Add(route);
-        }
-
-        public int? CalculateDistance(params City[] cities)
+        public int CalculateDistance(params City[] cities)
         {
             int distance = 0;
 
-            for (int i = 0; i < (cities.Count() - 1); i++)
+            for (int i = 0; (i + 1) < cities.Length; i++)
             {
-                Route route;
-
-                try
-                {
-                    route = Routes.Where(x => x.StartCity.Id == cities[i].Id && x.EndCity.Id == cities[i + 1].Id).First();
-                }
-                catch (Exception ex)
-                {
+                KeyValuePair<City, int> nextCity = cities[i].Connections.Where(x => x.Key.Id == cities[i + 1].Id).FirstOrDefault();
+                if (null != nextCity.Key)
+                    distance += nextCity.Value;
+                else
                     return -1;
-                }
-
-                distance += route.Distance;
             }
 
             return distance;
         }
 
-        public int PossibleTrips(GraphNode startCity, GraphNode endCity, int numberOfStops)
+        //Breadth first search
+        public IList<Trip> PossibleTrips(City startCity, City endCity, int numberOfStops)
         {
-            int possibleTrips = 0;
+            IList<Trip> trips = new List<Trip>();
+            IList<Trip> possibleTrips = new List<Trip>();
 
-            Queue<GraphNode> searchStack = new Queue<GraphNode>();
-            GraphNode current;
-            searchStack.Enqueue(startCity);
+            Queue<City> searchQueue = new Queue<City>();
+            searchQueue.Enqueue(startCity);
 
-            int[] lastLevels = new int[99];
+            City current;
+
+            int[] lastLevels = new int[numberOfStops + 1];
             int level = 0;
-            int index = 0;
             lastLevels[level] = 1;
 
-            while (searchStack.Count != 0)
+            int tripPointer = 0;
+            int index = 0;
+
+            trips.Add(new Trip());
+
+            while (searchQueue.Count != 0)
             {
                 lastLevels[level]--;
+                current = searchQueue.Dequeue();
 
-                if (level <= numberOfStops) {
-                    current = searchStack.Dequeue();
-                    if (current.Id == endCity.Id && index > 0)
-                    {
-                        possibleTrips++;
-                    }
+                trips[tripPointer].Cities.Add(current);
 
-                    foreach (GraphNode node in current.Nodes)
-                    {
-                        searchStack.Enqueue(node);
-                    }
-
-                    lastLevels[level + 1] += current.Nodes.Count;
-                    if (lastLevels[level] == 0) level++;
-                } else
+                if (current.Id == endCity.Id && index > 0)
                 {
-                    break;
+                    possibleTrips.Add(trips[tripPointer]);
+                }
+
+                if ((level + 1) <= numberOfStops)
+                {
+                    foreach (KeyValuePair<City, int> node in current.Connections)
+                    {
+                        searchQueue.Enqueue(node.Key);
+                    }
+
+                    lastLevels[level + 1] += current.Connections.Count;
+
+                    while (trips.Count < lastLevels[level + 1])
+                    {
+                        trips.Add(new Trip());
+                    }
+                }
+
+                tripPointer++;
+
+                if (lastLevels[level] == 0)
+                {
+                    level++;
+                    tripPointer = 0;
                 }
 
                 index++;
@@ -90,42 +85,59 @@ namespace trains
             return possibleTrips;
         }
 
-        public int PossibleTripsWithFixedStops(GraphNode startCity, GraphNode endCity, int numberOfStops)
+        //Breadth first search
+        public IList<Trip> PossibleTripsWithFixedNumberOfStops(City startCity, City endCity, int numberOfStops)
         {
-            int possibleTrips = 0;
+            IList<Trip> trips = new List<Trip>();
+            IList<Trip> possibleTrips = new List<Trip>();
 
-            Queue<GraphNode> searchStack = new Queue<GraphNode>();
-            GraphNode current;
-            searchStack.Enqueue(startCity);
+            Queue<City> searchQueue = new Queue<City>();
+            searchQueue.Enqueue(startCity);
 
-            int[] lastLevels = new int[99];
+            City current;
+
+            int[] lastLevels = new int[numberOfStops + 1];
             int level = 0;
-            int index = 0;
             lastLevels[level] = 1;
 
-            while (searchStack.Count != 0)
+            int tripPointer = 0;
+            int index = 0;
+
+            trips.Add(new Trip());
+
+            while (searchQueue.Count != 0)
             {
                 lastLevels[level]--;
+                current = searchQueue.Dequeue();
 
-                if (level <= numberOfStops)
+                trips[tripPointer].Cities.Add(current);
+
+                if (current.Id == endCity.Id && index > 0 && level == numberOfStops)
                 {
-                    current = searchStack.Dequeue();
-                    if (current.Id == endCity.Id && index > 0 && level == numberOfStops)
-                    {
-                        possibleTrips++;
-                    }
-
-                    foreach (GraphNode node in current.Nodes)
-                    {
-                        searchStack.Enqueue(node);
-                    }
-
-                    lastLevels[level + 1] += current.Nodes.Count;
-                    if (lastLevels[level] == 0) level++;
+                    possibleTrips.Add(trips[tripPointer]);
                 }
-                else
+
+                if ((level + 1) <= numberOfStops)
                 {
-                    break;
+                    foreach (KeyValuePair<City, int> node in current.Connections)
+                    {
+                        searchQueue.Enqueue(node.Key);
+                    }
+
+                    lastLevels[level + 1] += current.Connections.Count;
+
+                    while (trips.Count < lastLevels[level + 1])
+                    {
+                        trips.Add(new Trip());
+                    }
+                }
+
+                tripPointer++;
+
+                if (lastLevels[level] == 0)
+                {
+                    level++;
+                    tripPointer = 0;
                 }
 
                 index++;
